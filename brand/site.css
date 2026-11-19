@@ -1,0 +1,21 @@
+/* Ballerina Spa site overrides */
+
+/* transparent ballerina mark in hero, above title */
+.hero .inner{position:relative}
+.hero-logo{display:block;height:200px;width:auto;margin:0 auto 14px;object-fit:contain;
+  filter:drop-shadow(0 4px 18px rgba(0,0,0,.45))}
+@media (max-width:767px){
+  .hero-logo{height:130px;margin-bottom:10px}
+}
+
+/* zoomable gallery thumbs */
+.int-thumbs img,.bs-art-gallery img,.pick .strip img,.models-list img,.m-grid img,
+.profile-photos img,.a-gallery img{cursor:zoom-in}
+
+/* lightbox */
+.bs-lb{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  background:rgba(10,6,9,.9);backdrop-filter:blur(6px);cursor:zoom-out}
+.bs-lb img{max-width:92vw;max-height:90vh;object-fit:contain;border-radius:10px;
+  box-shadow:0 12px 60px rgba(0,0,0,.6)}
+.bs-lb-x{position:absolute;top:14px;right:20px;color:#fff;font-size:40px;line-height:1;
+  cursor:pointer;opacity:.85;text-shadow:0 2px 8px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none}
