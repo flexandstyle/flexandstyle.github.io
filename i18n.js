@@ -152,14 +152,20 @@ function xlateEl(el){
       if(hit)el.setAttribute(name,trArr(hit.arr));
     }
   }
-  // innerHTML strings that contain markup (e.g. <b>...</b>)
-  if(el.childElementCount>0&&el.childElementCount<12){
-    var h=el.innerHTML;
+  // innerHTML strings that contain markup (e.g. <b>...</b>) — only for pure
+  // formatting content; rewriting innerHTML of interactive/React containers
+  // orphans their tracked nodes and crashes React's reconciler
+  if(el.childElementCount>0&&el.childElementCount<12&&/<[bi]\s*>/i.test(el.innerHTML)
+    &&!el.querySelector('a,button,input,select,textarea,[role],[onclick],[contenteditable]')){
+    var h=el.__ruH!==undefined?el.__ruH:el.innerHTML;
     var key=norm(h);
     if(key&&key.length<4000){
-      if(el.__ruH===undefined)el.__ruH=h;
-      var hit2=lookupText(el.__ruH);
-      if(hit2)el.innerHTML=trArr(hit2.arr);
+      var hit2=lookupText(h);
+      if(hit2){
+        if(el.__ruH===undefined)el.__ruH=el.innerHTML;
+        el.innerHTML=trArr(hit2.arr);
+        el.__ruHX=1;
+      }
     }
   }
 }
@@ -169,7 +175,7 @@ function restoreEl(el){
   if(el.__ruA){
     for(var k in el.__ruA)el.setAttribute(k,el.__ruA[k]);
   }
-  if(el.__ruH!==undefined)el.innerHTML=el.__ruH;
+  if(el.__ruHX&&el.__ruH!==undefined){el.innerHTML=el.__ruH;el.__ruHX=0;}
 }
 
 function applyHead(){
@@ -269,6 +275,7 @@ function startObs(){
       }
       if(titleHit)applyHead();
       patchHeroLogo();
+      patchChrome();
     }finally{busy=false;obs.observe(document.body,{childList:true,subtree:true,characterData:true});}
   });
   obs.observe(document.body,{childList:true,subtree:true,characterData:true});
@@ -286,6 +293,93 @@ function patchHeroLogo(){
     if(h1)inner.insertBefore(inner.querySelector('.hero-logo'),h1);
   }catch(e){}
 }
+// strip disabled outcall links (vyezd) wherever they render
+var VYEZD_SEL='a[href^="/vyezd"],a[href*="podarok-na-vyezd"],a[href*="vyiezdom-na-dom"],a[href*="na-domu"]';
+function cleanVyezd(root){
+  try{
+    var els=(root||document).querySelectorAll?[].slice.call((root||document).querySelectorAll(VYEZD_SEL)):[];
+    for(var i=0;i<els.length;i++)els[i].remove();
+  }catch(e){}
+}
+cleanVyezd(document);
+
+// ===== drawer extras: language switch + 24/7 + phone =====
+var MENU_LANG_ORDER=['ru','sl','en','sr'];
+function patchMenu(){
+  try{
+    var dr=document.querySelector('.drawer');
+    if(!dr||dr.querySelector('.bs-menu-meta'))return;
+    var meta=document.createElement('div');
+    meta.className='bs-menu-meta';
+    var langBtns='';
+    for(var i=0;i<MENU_LANG_ORDER.length;i++){
+      var c=MENU_LANG_ORDER[i];
+      langBtns+='<button type="button" data-l="'+c+'"'+(cur===c?' class="on"':'')+'>'+SHORT[c]+'</button>';
+    }
+    meta.innerHTML='<div class="bs-mm-line"><span class="bs-mm-247">24/7</span><span class="bs-mm-phone">+386 40 210 380</span></div><div class="bs-menu-lang">'+langBtns+'</div>';
+    var mc=dr.querySelector('.bs-menu-contacts');
+    dr.insertBefore(meta,mc||dr.querySelector('.bs-menu-addr')||null);
+    meta.addEventListener('click',function(e){
+      var b=e.target&&e.target.closest('button[data-l]');
+      if(!b)return;
+      window.__setLang(b.getAttribute('data-l'));
+      var all=meta.querySelectorAll('button');
+      for(var k=0;k<all.length;k++)all[k].classList.toggle('on',all[k]===b);
+    });
+  }catch(e){}
+}
+
+// ===== scroll lock while menu open =====
+var lockY=0;
+function syncLock(){
+  try{
+    var open=document.querySelector('.drawer.open');
+    if(open&&!document.body.classList.contains('bs-lock')){
+      lockY=window.scrollY||document.documentElement.scrollTop||0;
+      document.body.classList.add('bs-lock');
+      document.body.style.top=(-lockY)+'px';
+    }else if(!open&&document.body.classList.contains('bs-lock')){
+      document.body.classList.remove('bs-lock');
+      document.body.style.top='';
+      window.scrollTo(0,lockY);
+    }
+  }catch(e){}
+}
+function watchDrawer(){
+  try{
+    var d=document.querySelector('.drawer');
+    if(!d||d.__lockWatched)return;
+    d.__lockWatched=1;
+    new MutationObserver(syncLock).observe(d,{attributes:true,attributeFilter:['class']});
+    syncLock();
+  }catch(e){}
+}
+
+// ===== custom map pin =====
+function patchMapPin(){
+  try{
+    var ifr=document.querySelector('iframe[title="map"]');
+    if(!ifr||!ifr.parentElement)return;
+    var p=ifr.parentElement;
+    if(p.querySelector('.bs-map-pin'))return;
+    if(getComputedStyle(p).position==='static')p.style.position='relative';
+    var pin=document.createElement('div');
+    pin.className='bs-map-pin';
+    pin.innerHTML='<i></i><img src="/brand/logo-head.png" alt=""/>';
+    p.appendChild(pin);
+  }catch(e){}
+}
+
+function patchChrome(){
+  cleanVyezd(document);
+  patchMenu();
+  watchDrawer();
+  patchMapPin();
+}
+if(document.readyState==='complete')setTimeout(patchChrome,400);
+else window.addEventListener('load',function(){setTimeout(patchChrome,400);});
+document.addEventListener('DOMContentLoaded',function(){setTimeout(patchChrome,300);});
+
 var logoTries=0;
 var logoTimer=null;
 function startLogoPatch(){

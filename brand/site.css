@@ -1,5 +1,63 @@
 /* Ballerina Spa site overrides */
 
+/* ===== header: logo mark left, burger right ===== */
+.bs-header .h-left{order:3;margin-left:auto;gap:0}
+.bs-header .logo{position:static;transform:none;display:flex;align-items:center;gap:12px;text-align:left;margin-right:auto}
+.bs-header .logo::before{content:"";width:46px;height:41px;flex:none;
+  background:url("/brand/logo-head.png") center/contain no-repeat}
+.bs-header .h-right{display:none}
+@media (max-width:520px){
+  .bs-header .logo .b{font-size:21px}
+  .bs-header .logo::before{width:38px;height:34px}
+}
+
+/* brand name: BALLERINA in accent, SPA white (was inverted) */
+.logo .b,.f-logo .b,.bs-agegate-logo .b{color:var(--pink)!important}
+.logo .s,.f-logo .s,.bs-agegate-logo .s{color:#fff!important}
+
+/* ===== scroll lock while menu open ===== */
+body.bs-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll-behavior:none}
+.drawer{overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ===== drawer extras: 24/7, phone, language ===== */
+.drawer .bs-menu-meta{display:flex;flex-direction:column;gap:14px;
+  padding:26px clamp(30px,3vw,56px) 0}
+.bs-mm-line{display:flex;align-items:baseline;gap:16px}
+.bs-mm-247{color:#fff;opacity:.85;font-weight:700;font-size:14px;letter-spacing:.1em}
+.bs-mm-phone{color:#fff;font-weight:800;font-size:19px;letter-spacing:.02em}
+.bs-menu-lang{display:flex;gap:8px;flex-wrap:wrap}
+.bs-menu-lang button{appearance:none;border:1px solid rgba(255,255,255,.5);background:transparent;
+  color:#fff;font-weight:800;font-size:13px;letter-spacing:.1em;padding:8px 14px;
+  border-radius:999px;cursor:pointer;transition:.2s}
+.bs-menu-lang button.on{background:#fff;color:#c9876f;border-color:#fff}
+
+/* ===== contacts: WhatsApp + Telegram only ===== */
+.f-soc a:not([href*="wa.me"]):not([href*="t.me"]),
+.bs-menu-contacts a:not([href*="wa.me"]):not([href*="t.me"]),
+.site-touchpoints-fan .site-fan-hit:not([href*="wa.me"]):not([href*="t.me"]){display:none!important}
+.site-touchpoints-fan div[aria-hidden="true"]>span:not([style*="#25D366"]):not([style*="#2AABEE"]):not([style*="#eabdb0"]){display:none!important}
+
+/* ===== map: dark brand filter + custom pin ===== */
+iframe[title="map"]{filter:invert(.9) hue-rotate(200deg) saturate(.5) brightness(.92) contrast(.9)}
+.bs-map-pin{position:absolute;left:50%;top:50%;width:52px;height:52px;z-index:5;
+  transform:translate(-50%,-92%);pointer-events:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.bs-map-pin i{position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50% 50% 50% 4px;
+  transform:translate(-50%,-50%) rotate(-45deg);background:var(--pink);display:block;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+.bs-map-pin img{position:absolute;left:50%;top:47%;width:30px;height:27px;transform:translate(-50%,-50%)}
+
+/* ===== disclaimer strip under footer ===== */
+[data-disclaimer]{background:var(--bg-2)!important;color:#cdbfb8!important;
+  border-top:1px solid rgba(234,189,176,.28)!important}
+[data-disclaimer] a,[data-disclaimer] button{color:var(--pink)!important}
+[data-disclaimer] span[aria-label="18+"]{border-color:var(--pink)!important;color:var(--pink-2)!important}
+
+/* ===== mobile hero: kill scroll parallax (zoom/slide bug) ===== */
+@media (max-width:820px){
+  .hero-bg{transform:none!important}
+  .hero .inner{transform:none!important}
+}
+
 /* transparent ballerina mark in hero, above title */
 .hero .inner{position:relative}
 .hero-logo{display:block;height:200px;width:auto;margin:0 auto 14px;object-fit:contain;
