@@ -1,5 +1,16 @@
 (function(){
 "use strict";
+// static host: stub dead backend endpoints (analytics beacon, presence,
+// emergency notice, form posts) so they don't hit the network or log 404/405
+(function(){
+  var DEAD=/\/(__vp\/api\/|api\/admin\/|v1\/public\/(presence|leads|job-applications|touchpoints|tenants\/by-slug\/[^/?#]+\/touchpoints))/;
+  var _f=window.fetch;
+  if(_f)window.fetch=function(u){var s=typeof u==='string'?u:(u&&u.url)||'';if(DEAD.test(s))return Promise.resolve(new Response('[]',{status:200,headers:{'Content-Type':'application/json'}}));return _f.apply(this,arguments)};
+  var _b=navigator.sendBeacon;
+  if(_b)navigator.sendBeacon=function(u){if(DEAD.test(typeof u==='string'?u:''))return true;return _b.apply(this,arguments)};
+  var _o=XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open=function(m,u){if(DEAD.test(typeof u==='string'?u:'')){m='GET';u='/api-stub.json'}return _o.call(this,m,u)};
+})();
 var D=window.I18N||{m:{},p:[]};
 var IDX={en:0,sl:1,sr:2};
 var LANGS=['ru','en','sl','sr'];
