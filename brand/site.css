@@ -26,7 +26,13 @@
 
 /* ===== scroll lock while menu open ===== */
 body.bs-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll-behavior:none}
-.drawer{overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* drawer: no horizontal scroll (links fly in from -115%), no ugly scrollbar, top never clipped */
+.drawer{overflow-y:auto;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;
+  justify-content:safe center!important;scrollbar-width:none;-ms-overflow-style:none}
+.drawer::-webkit-scrollbar{display:none}
+
+/* anchors: header must not cover section titles */
+html{scroll-padding-top:100px}
 
 /* ===== drawer extras: 24/7, phone, language ===== */
 .drawer .bs-menu-meta{display:flex;flex-direction:column;gap:14px;
@@ -46,7 +52,7 @@ body.bs-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll
 .site-touchpoints-fan{display:none!important}
 /* brand vars for body-level widgets (.bs-sup, .bs-lb live outside .bs-site) */
 body{--pink:#eabdb0;--pink-2:#f3d5cc;--on-pink:#2a1810;--bg-2:#100e14}
-.bs-sup{position:fixed;right:18px;bottom:18px;z-index:900;display:flex;align-items:center;gap:10px}
+.bs-sup{position:fixed;right:18px;bottom:18px;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 .bs-sup-btn{width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
   background:var(--pink);color:#2b1512;display:flex;align-items:center;justify-content:center;
   box-shadow:0 8px 24px rgba(0,0,0,.45);transition:transform .2s}
@@ -54,7 +60,7 @@ body{--pink:#eabdb0;--pink-2:#f3d5cc;--on-pink:#2a1810;--bg-2:#100e14}
 .bs-sup-oval{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 8px;border-radius:999px;
   background:rgba(22,14,18,.94);border:1px solid rgba(234,189,176,.4);
   box-shadow:0 8px 24px rgba(0,0,0,.5);
-  opacity:0;transform:translateX(14px);pointer-events:none;transition:.25s}
+  opacity:0;transform:translateY(14px);pointer-events:none;transition:.25s}
 .bs-sup.open .bs-sup-oval{opacity:1;transform:none;pointer-events:auto}
 .bs-sup-x{color:rgba(255,255,255,.7);font-size:22px;line-height:1;cursor:pointer;
   width:26px;height:26px;display:flex;align-items:center;justify-content:center}
@@ -89,9 +95,18 @@ iframe[title="map"]{filter:invert(.93) hue-rotate(195deg) saturate(.32) brightne
 
 /* hero logo removed per design */
 
-/* featured campaign card: kill ugly white frame */
-[class*="MarketingCampaigns_featured"]{border-color:rgba(255,255,255,.08)!important}
+/* featured campaign card: brand accent (was foreign gold), subtle frame */
+[class*="MarketingCampaigns_featured"]{--marketing-accent:#eabdb0!important;
+  border-color:rgba(255,255,255,.08)!important}
 [class*="MarketingCampaigns"] [class*="badge"],[class*="campaign"] [class*="badge"]{border-color:var(--pink)!important}
+[class*="MarketingCampaigns_cta"]{border-radius:999px!important}
+
+/* page scrollbar: slimmer, quieter brand tone */
+html{scrollbar-width:thin;scrollbar-color:rgba(234,189,176,.45) #0d0b10}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:#0d0b10}
+::-webkit-scrollbar-thumb{background:rgba(234,189,176,.45);border-radius:999px;border:2px solid #0d0b10;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(234,189,176,.7);border:2px solid #0d0b10;background-clip:padding-box}
 
 /* outcall leftovers (footer nav etc.) */
 a[href*="/vyezd"],li:has(>a[href*="/vyezd"]){display:none!important}

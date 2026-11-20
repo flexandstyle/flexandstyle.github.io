@@ -371,13 +371,38 @@ function patchMapPin(){
   }catch(e){}
 }
 
+// first catalog rows load eagerly; deep list stays lazy
+var eagerDone=false;
+function patchLazy(){
+  if(eagerDone)return;
+  var imgs=document.querySelectorAll('main img[loading="lazy"]');
+  if(imgs.length<4)return;
+  eagerDone=true;
+  for(var i=0;i<imgs.length&&i<10;i++){
+    imgs[i].loading='eager';
+    try{imgs[i].fetchPriority='high';}catch(e){}
+  }
+}
+
+// security: external links open safely
+function patchBlank(){
+  var ls=document.querySelectorAll('a[target="_blank"]:not([rel*="noopener"])');
+  for(var i=0;i<ls.length;i++)ls[i].rel='noopener noreferrer';
+}
+
 function patchChrome(){
   cleanVyezd(document);
   patchMenu();
   watchDrawer();
   patchMapPin();
   patchSupport();
+  patchLazy();
+  patchBlank();
 }
+
+// land on top after navigation unless a hash anchor is present
+if('scrollRestoration' in history)history.scrollRestoration='auto';
+if(!location.hash)window.scrollTo(0,0);
 if(document.readyState==='complete')setTimeout(patchChrome,400);
 else window.addEventListener('load',function(){setTimeout(patchChrome,400);});
 document.addEventListener('DOMContentLoaded',function(){setTimeout(patchChrome,300);});
