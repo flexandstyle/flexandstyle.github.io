@@ -39,6 +39,7 @@ function lookupText(raw,depth){
   depth=depth||0;
   var key=norm(raw);
   if(!key)return null;
+  if(key.indexOf('{')>=0||key.indexOf('}')>=0)return null; // never touch templates React fills
   var hit=D.m[key];
   if(hit)return {arr:hit};
   for(var i=0;i<D.p.length;i++){
@@ -241,6 +242,13 @@ function applyAll(){
     busy=false;
     startObs();
     startHeadObs();
+    // second sweep on next frame: catches nodes React rendered while busy
+    setTimeout(function(){
+      if(cur==='ru')return;
+      busy=true;if(obs)obs.disconnect();
+      try{walk(document.body,xlateNode);walkEls(document.body,xlateEl);applyHead();}
+      finally{busy=false;if(obs)obs.observe(document.body,{childList:true,subtree:true,characterData:true});}
+    },80);
   }
 }
 
@@ -282,23 +290,16 @@ function startObs(){
 }
 
 var SHORT={en:'EN',sl:'SL',sr:'SR',ru:'RU'};
-
-// inject transparent ballerina mark into hero, above the H1 (hydration-safe)
-function patchHeroLogo(){
-  try{
-    var inner=document.querySelector('.hero .inner');
-    if(!inner||inner.querySelector('.hero-logo'))return;
-    var h1=inner.querySelector('h1');
-    inner.insertAdjacentHTML('afterbegin','<img src="/brand/logo-hero.png" alt="Ballerina Spa" class="hero-logo" width="715" height="665"/>');
-    if(h1)inner.insertBefore(inner.querySelector('.hero-logo'),h1);
-  }catch(e){}
-}
+function patchHeroLogo(){} // hero logo removed per design
 // strip disabled outcall links (vyezd) wherever they render
 var VYEZD_SEL='a[href^="/vyezd"],a[href*="podarok-na-vyezd"],a[href*="vyiezdom-na-dom"],a[href*="na-domu"]';
 function cleanVyezd(root){
   try{
     var els=(root||document).querySelectorAll?[].slice.call((root||document).querySelectorAll(VYEZD_SEL)):[];
-    for(var i=0;i<els.length;i++)els[i].remove();
+    for(var i=0;i<els.length;i++){
+      var li=els[i].closest('li');
+      if(li)li.remove();else els[i].remove();
+    }
   }catch(e){}
 }
 cleanVyezd(document);
@@ -375,20 +376,35 @@ function patchChrome(){
   patchMenu();
   watchDrawer();
   patchMapPin();
+  patchSupport();
 }
 if(document.readyState==='complete')setTimeout(patchChrome,400);
 else window.addEventListener('load',function(){setTimeout(patchChrome,400);});
 document.addEventListener('DOMContentLoaded',function(){setTimeout(patchChrome,300);});
 
-var logoTries=0;
-var logoTimer=null;
-function startLogoPatch(){
-  if(logoTimer)return;
-  patchHeroLogo();
-  logoTimer=setInterval(function(){patchHeroLogo();if(++logoTries>=12)clearInterval(logoTimer);},1200);
+// support widget: peach circle -> oval with WhatsApp + Telegram
+function patchSupport(){
+  try{
+    if(document.querySelector('.bs-sup'))return;
+    var fan=document.querySelector('.site-touchpoints-fan');
+    var wa=null,tg=null;
+    if(fan){
+      wa=fan.querySelector('a[href*="wa.me"]');
+      tg=fan.querySelector('a[href*="t.me"]');
+    }
+    var w=document.createElement('div');
+    w.className='bs-sup';
+    var oval='<div class="bs-sup-oval"></div>';
+    w.innerHTML=oval+'<button type="button" class="bs-sup-btn" aria-label="Support"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>';
+    var ov=w.querySelector('.bs-sup-oval');
+    if(wa){var a=wa.cloneNode(true);a.removeAttribute('style');a.removeAttribute('aria-hidden');a.className='bs-sup-i';ov.appendChild(a);}
+    if(tg){var b=tg.cloneNode(true);b.removeAttribute('style');b.removeAttribute('aria-hidden');b.className='bs-sup-i';ov.appendChild(b);}
+    var xs=document.createElement('span');xs.className='bs-sup-x';xs.innerHTML='&times;';ov.appendChild(xs);
+    document.body.appendChild(w);
+    w.querySelector('.bs-sup-btn').addEventListener('click',function(){w.classList.toggle('open');});
+    w.querySelector('.bs-sup-x').addEventListener('click',function(){w.classList.remove('open');});
+  }catch(e){}
 }
-if(document.readyState==='complete')setTimeout(startLogoPatch,700);
-else window.addEventListener('load',function(){setTimeout(startLogoPatch,700);});
 
 // lightweight lightbox for photo galleries
 document.addEventListener('click',function(e){

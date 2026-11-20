@@ -1,14 +1,23 @@
 /* Ballerina Spa site overrides */
 
-/* ===== header: logo mark left, burger right ===== */
-.bs-header .h-left{order:3;margin-left:auto;gap:0}
-.bs-header .logo{position:static;transform:none;display:flex;align-items:center;gap:12px;text-align:left;margin-right:auto}
-.bs-header .logo::before{content:"";width:46px;height:41px;flex:none;
+/* ===== header: mark abs-left, wordmark centered stacked, burger abs-right ===== */
+.bs-header{position:relative}
+.bs-header::before{content:"";position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  width:46px;height:41px;z-index:3;pointer-events:none;
   background:url("/brand/logo-head.png") center/contain no-repeat}
+.bs-header .logo{position:static!important;transform:none!important;margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:0}
+.bs-header .logo::before{display:none}
+.bs-header .logo .b{line-height:1.15}
+.bs-header .logo .s{line-height:1.1}
+.bs-header .h-left{order:0;margin-left:0;position:absolute;right:14px;top:50%;
+  transform:translateY(-50%);z-index:3}
 .bs-header .h-right{display:none}
 @media (max-width:520px){
-  .bs-header .logo .b{font-size:21px}
-  .bs-header .logo::before{width:38px;height:34px}
+  .bs-header::before{width:36px;height:33px;left:10px}
+  .bs-header .h-left{right:8px}
+  .bs-header .logo .b{font-size:19px}
 }
 
 /* brand name: BALLERINA in accent, SPA white (was inverted) */
@@ -31,20 +40,40 @@ body.bs-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll
   border-radius:999px;cursor:pointer;transition:.2s}
 .bs-menu-lang button.on{background:#fff;color:#c9876f;border-color:#fff}
 
-/* ===== contacts: WhatsApp + Telegram only ===== */
+/* ===== contacts: hide old fan, custom support widget ===== */
 .f-soc a:not([href*="wa.me"]):not([href*="t.me"]),
 .bs-menu-contacts a:not([href*="wa.me"]):not([href*="t.me"]),
-.site-touchpoints-fan .site-fan-hit:not([href*="wa.me"]):not([href*="t.me"]){display:none!important}
-.site-touchpoints-fan div[aria-hidden="true"]>span:not([style*="#25D366"]):not([style*="#2AABEE"]):not([style*="#eabdb0"]){display:none!important}
+.site-touchpoints-fan{display:none!important}
+/* brand vars for body-level widgets (.bs-sup, .bs-lb live outside .bs-site) */
+body{--pink:#eabdb0;--pink-2:#f3d5cc;--on-pink:#2a1810;--bg-2:#100e14}
+.bs-sup{position:fixed;right:18px;bottom:18px;z-index:900;display:flex;align-items:center;gap:10px}
+.bs-sup-btn{width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--pink);color:#2b1512;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.45);transition:transform .2s}
+.bs-sup-btn:hover{transform:scale(1.06)}
+.bs-sup-oval{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 8px;border-radius:999px;
+  background:rgba(22,14,18,.94);border:1px solid rgba(234,189,176,.4);
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  opacity:0;transform:translateX(14px);pointer-events:none;transition:.25s}
+.bs-sup.open .bs-sup-oval{opacity:1;transform:none;pointer-events:auto}
+.bs-sup-x{color:rgba(255,255,255,.7);font-size:22px;line-height:1;cursor:pointer;
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.bs-sup-i{width:44px;height:44px;border-radius:50%;display:flex!important;align-items:center;
+  justify-content:center;background:var(--pink);color:#2b1512;flex:none;
+  position:static!important;opacity:1!important;transform:none!important;pointer-events:auto!important}
+.bs-sup-i svg{width:22px;height:22px}
+.bs-sup-i *{pointer-events:none}
+.bs-sup.open .bs-sup-btn svg{transform:rotate(90deg);transition:.2s}
 
-/* ===== map: dark brand filter + custom pin ===== */
-iframe[title="map"]{filter:invert(.9) hue-rotate(200deg) saturate(.5) brightness(.92) contrast(.9)}
-.bs-map-pin{position:absolute;left:50%;top:50%;width:52px;height:52px;z-index:5;
-  transform:translate(-50%,-92%);pointer-events:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
-.bs-map-pin i{position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50% 50% 50% 4px;
+/* ===== map: strong brand filter + pin ===== */
+iframe[title="map"]{filter:invert(.93) hue-rotate(195deg) saturate(.32) brightness(.8) contrast(1.12)}
+.bs-map-pin{position:absolute;left:50%;top:50%;width:64px;height:64px;z-index:5;
+  transform:translate(-50%,-94%);pointer-events:none;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.6))}
+.bs-map-pin i{position:absolute;left:50%;top:50%;width:54px;height:54px;border-radius:50% 50% 50% 6px;
   transform:translate(-50%,-50%) rotate(-45deg);background:var(--pink);display:block;
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
-.bs-map-pin img{position:absolute;left:50%;top:47%;width:30px;height:27px;transform:translate(-50%,-50%)}
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.5),0 0 0 6px rgba(234,189,176,.22)}
+.bs-map-pin img{position:absolute;left:50%;top:46%;width:36px;height:33px;transform:translate(-50%,-50%)}
 
 /* ===== disclaimer strip under footer ===== */
 [data-disclaimer]{background:var(--bg-2)!important;color:#cdbfb8!important;
@@ -58,13 +87,17 @@ iframe[title="map"]{filter:invert(.9) hue-rotate(200deg) saturate(.5) brightness
   .hero .inner{transform:none!important}
 }
 
-/* transparent ballerina mark in hero, above title */
-.hero .inner{position:relative}
-.hero-logo{display:block;height:200px;width:auto;margin:0 auto 14px;object-fit:contain;
-  filter:drop-shadow(0 4px 18px rgba(0,0,0,.45))}
-@media (max-width:767px){
-  .hero-logo{height:130px;margin-bottom:10px}
-}
+/* hero logo removed per design */
+
+/* featured campaign card: kill ugly white frame */
+[class*="MarketingCampaigns_featured"]{border-color:rgba(255,255,255,.08)!important}
+[class*="MarketingCampaigns"] [class*="badge"],[class*="campaign"] [class*="badge"]{border-color:var(--pink)!important}
+
+/* outcall leftovers (footer nav etc.) */
+a[href*="/vyezd"],li:has(>a[href*="/vyezd"]){display:none!important}
+
+/* active filter chips: brand border instead of white */
+.on{border-color:var(--pink)!important}
 
 /* zoomable gallery thumbs */
 .int-thumbs img,.bs-art-gallery img,.pick .strip img,.models-list img,.m-grid img,
