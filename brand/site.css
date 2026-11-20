@@ -70,14 +70,20 @@ body{--pink:#eabdb0;--pink-2:#f3d5cc;--on-pink:#2a1810;--bg-2:#100e14}
   box-shadow:0 8px 24px rgba(0,0,0,.5);
   opacity:0;transform:translateY(14px);pointer-events:none;transition:.25s}
 .bs-sup.open .bs-sup-oval{opacity:1;transform:none;pointer-events:auto}
-.bs-sup-x{color:rgba(255,255,255,.7);font-size:22px;line-height:1;cursor:pointer;
-  width:26px;height:26px;display:flex;align-items:center;justify-content:center}
-.bs-sup-i{width:44px;height:44px;border-radius:50%;display:flex!important;align-items:center;
+.bs-sup-i{width:56px;height:56px;border-radius:50%;display:flex!important;align-items:center;
   justify-content:center;background:var(--pink);color:#2b1512;flex:none;
-  position:static!important;opacity:1!important;transform:none!important;pointer-events:auto!important}
-.bs-sup-i svg{width:22px;height:22px}
+  position:static!important;opacity:0;transform:translateY(14px) scale(.6)!important;
+  pointer-events:auto!important;box-shadow:0 8px 24px rgba(0,0,0,.45);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1) calc(var(--i,0)*.07s),opacity .2s calc(var(--i,0)*.07s)}
+.bs-sup.open .bs-sup-i{opacity:1;transform:none!important}
+.bs-sup-i svg{width:26px;height:26px}
 .bs-sup-i *{pointer-events:none}
-.bs-sup.open .bs-sup-btn svg{transform:rotate(90deg);transition:.2s}
+/* morph: chat bubble <-> X inside the same button */
+.bs-sup-btn{position:relative;overflow:hidden}
+.bs-sup-btn svg{position:absolute;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s}
+.bs-sup-btn .ic-x{transform:rotate(-90deg) scale(.4);opacity:0}
+.bs-sup.open .bs-sup-btn .ic-chat{transform:rotate(90deg) scale(.4);opacity:0}
+.bs-sup.open .bs-sup-btn .ic-x{transform:none;opacity:1}
 
 /* ===== map: strong brand filter + pin ===== */
 iframe[title="map"]{filter:invert(.93) hue-rotate(195deg) saturate(.32) brightness(.8) contrast(1.12)}
@@ -100,6 +106,35 @@ iframe[title="map"]{filter:invert(.93) hue-rotate(195deg) saturate(.32) brightne
   .hero-bg{transform:none!important;will-change:auto}
   .hero .inner{transform:none!important}
   .hero{padding-bottom:56px}
+}
+
+/* ===== drawer: everything must fit on short screens ===== */
+@media (max-height:780px){
+  .drawer nav{gap:2px!important}
+  .drawer nav a{font-size:clamp(17px,3.2vh,26px)!important;padding:5px 0!important;line-height:1.12!important}
+  .drawer .bs-menu-meta{gap:9px;padding-top:14px}
+  .drawer .bs-mm-line{font-size:15px}
+  .drawer .bs-menu-lang button{width:38px;height:38px;font-size:12px}
+  .drawer .bs-menu-contacts a{width:44px;height:44px}
+  .drawer .bs-menu-addr{font-size:12px;margin-top:8px}
+}
+
+/* ===== model profile: align with site brand (was navy + serif) ===== */
+[class*="A1Profile_root"]{--p-bg:#0a0a0c!important;--p-panel:#15131a!important;
+  --p-muted:#b9b3bf!important;--p-line:rgba(255,255,255,.09)!important}
+[class*="A1Profile_desktopName"] h1,[class*="A1Profile_mobileName"] h1{
+  font-family:var(--font-montserrat),"Montserrat",sans-serif!important;
+  font-weight:800;text-transform:uppercase;letter-spacing:-.02em;line-height:.95}
+[class*="A1Profile_stats"] dd{font-family:var(--font-montserrat),"Montserrat",sans-serif!important;font-weight:700}
+[class*="A1Profile_brand"] b{font-family:var(--font-montserrat),"Montserrat",sans-serif!important;font-weight:800}
+/* profile drawer: same look + always fits */
+[class*="A1Profile_menuDrawer"]{overflow-y:auto;overflow-x:hidden;
+  justify-content:safe center!important;scrollbar-width:none}
+[class*="A1Profile_menuDrawer"]::-webkit-scrollbar{display:none}
+[class*="A1Profile_menuDrawer"] nav a{font-family:var(--font-montserrat),"Montserrat",sans-serif!important;
+  text-transform:uppercase;letter-spacing:-.01em;line-height:1.15}
+@media (max-height:780px){
+  [class*="A1Profile_menuDrawer"] nav a{font-size:clamp(17px,3.2vh,26px)!important;line-height:1.1!important}
 }
 
 /* hero logo removed per design */

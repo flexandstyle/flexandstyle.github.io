@@ -371,16 +371,13 @@ function patchMapPin(){
   }catch(e){}
 }
 
-// first catalog rows load eagerly; deep list stays lazy
-var eagerDone=false;
+// catalog cards: browsers lazy-load them so cells sit empty on slow nets;
+// strip lazy so rendered cards fill in DOM order. Profile galleries keep lazy.
 function patchLazy(){
-  if(eagerDone)return;
   var imgs=document.querySelectorAll('main img[loading="lazy"]');
-  if(imgs.length<4)return;
-  eagerDone=true;
-  for(var i=0;i<imgs.length&&i<10;i++){
-    imgs[i].loading='eager';
-    try{imgs[i].fetchPriority='high';}catch(e){}
+  for(var i=0;i<imgs.length;i++){
+    imgs[i].removeAttribute('loading');
+    if(i<12){try{imgs[i].fetchPriority='high';}catch(e){}}
   }
 }
 
@@ -420,14 +417,13 @@ function patchSupport(){
     var w=document.createElement('div');
     w.className='bs-sup';
     var oval='<div class="bs-sup-oval"></div>';
-    w.innerHTML=oval+'<button type="button" class="bs-sup-btn" aria-label="Support"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>';
+    w.innerHTML=oval+'<button type="button" class="bs-sup-btn" aria-label="Support"><svg class="ic-chat" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><svg class="ic-x" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
     var ov=w.querySelector('.bs-sup-oval');
-    if(wa){var a=wa.cloneNode(true);a.removeAttribute('style');a.removeAttribute('aria-hidden');a.className='bs-sup-i';ov.appendChild(a);}
-    if(tg){var b=tg.cloneNode(true);b.removeAttribute('style');b.removeAttribute('aria-hidden');b.className='bs-sup-i';ov.appendChild(b);}
-    var xs=document.createElement('span');xs.className='bs-sup-x';xs.innerHTML='&times;';ov.appendChild(xs);
+    var idx=0;
+    if(wa){var a=wa.cloneNode(true);a.removeAttribute('style');a.removeAttribute('aria-hidden');a.className='bs-sup-i';a.style.setProperty('--i',idx++);ov.appendChild(a);}
+    if(tg){var b=tg.cloneNode(true);b.removeAttribute('style');b.removeAttribute('aria-hidden');b.className='bs-sup-i';b.style.setProperty('--i',idx++);ov.appendChild(b);}
     document.body.appendChild(w);
     w.querySelector('.bs-sup-btn').addEventListener('click',function(){w.classList.toggle('open');});
-    w.querySelector('.bs-sup-x').addEventListener('click',function(){w.classList.remove('open');});
   }catch(e){}
 }
 
